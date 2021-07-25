@@ -1,0 +1,29 @@
+<script>
+(function() {
+  var produtos = document.querySelectorAll('#content > div > form > div > table > tbody > tr');
+  var produtosObj = [];
+  
+  if (produtos !== null) {
+    produtos.forEach(function(produto) {
+      var nomeProduto = produto.childNodes[3].textContent;
+      var modeloProduto = produto.childNodes[5].textContent;
+      var quantidadeProduto = produto.childNodes[7].childNodes[1].childNodes[1].childNodes[1].value;
+      var precoProduto = produto.childNodes[9].textContent;
+      var totalProduto = produto.childNodes[11].textContent;
+    
+      produtosObj.push({
+        'productName': nomeProduto,
+        'productModel': modeloProduto,
+        'productQuantity': quantidadeProduto,
+        'productPrice': precoProduto,
+        'productTotal': totalProduto
+      })
+    });
+  }
+  
+  dataLayer.push({
+    'event': 'viewCart',
+    'products': produtosObj
+  });
+})();
+</script>
