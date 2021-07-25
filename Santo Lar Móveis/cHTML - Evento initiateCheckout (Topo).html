@@ -1,0 +1,36 @@
+<script>
+(function() {
+  var botao = document.querySelector('#cart-content > ul > li.cart-totals > div > div > a.btn-checkout.btn');
+  var labels = document.querySelectorAll('#cart-content > ul > li.cart-totals > div > table > tbody > tr > td.text-right.td-total-title');
+  
+  var metodoFrete = '';
+  var valorFrete = '';
+  var subTotal = '';
+  var total = '';
+  
+  if (labels !== null) {
+    labels.forEach(function(label) {
+    if (label.textContent.toLowerCase().indexOf('dias') !== -1) {
+      metodoFrete = label.textContent;
+      valorFrete = label.parentElement.childNodes[3].textContent;
+    }
+    
+    if (label.textContent.toLowerCase().indexOf('sub-total') !== -1) subTotal = label.parentElement.childNodes[3].textContent;
+    
+    if (label.textContent.toLowerCase().indexOf('total') !== -1) total = label.parentElement.childNodes[3].textContent;
+    });
+  }  
+  
+  if (botao !== null) {
+    botao.addEventListener('click', function() {
+      dataLayer.push({
+        'event': 'initiateCheckout',
+        'shippingMethod': metodoFrete,
+        'shippingPrice': valorFrete,
+        'subTotal': subTotal,
+        'total': total
+      });
+    });
+  }
+})();
+</script>
