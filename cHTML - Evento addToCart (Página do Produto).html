@@ -1,0 +1,26 @@
+<script>
+(function() {
+  var botao = document.querySelector('#button-cart');
+  var botaoCompreJa = document.querySelector("#product > div.button-group-page > div > div.stepper-group.cart-group > div.extra-group > a.btn.btn-extra.btn-extra-46.btn-1-extra");
+  
+  if (botao !== null) adicionaEventListenerClique(botao);
+  if (botaoCompreJa !== null) adicionaEventListenerClique(botaoCompreJa);  
+  //Evento para adicionar Event Listener
+  function adicionaEventListenerClique(btn) {
+    btn.addEventListener('click', function() {
+      eventoAddToCart(btn);
+    });
+  }
+  //Adicionando evento addToCart ao dataLayer
+  function eventoAddToCart(botao) {
+    var quantidade = document.querySelector("#product-quantity").value;
+    
+    dataLayer.push({
+      'event':'addToCart',
+      'productName': {{DOM - Nome do Produto}},
+      'productValue': {{DOM - Preço do Produto}},
+      'quantity': quantidade,
+    });
+  }
+})();
+</script>
