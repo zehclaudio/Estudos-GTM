@@ -1,0 +1,43 @@
+<script>
+(function() {
+  var botoes = document.querySelectorAll('a.btn.btn-cart');
+  var botoesCompreJa = document.querySelectorAll('a.btn.btn-extra.btn-extra-46 > span');
+  var btnsComprar = [];
+  //Populando os arrays com os botões de adicionar ao carrinho
+  botoes.forEach(function(botao) {
+    if (botao.text === 'Comprar') btnsComprar.push(botao);
+  });
+  
+  if (btnsComprar !== null) {
+      btnsComprar.forEach(function(btn) {
+      adicionaEventListenerClique(btn);
+    });
+  }
+  
+  if (botoesCompreJa !== null) {
+    botoesCompreJa.forEach(function(btn) {
+      adicionaEventListenerClique(btn);
+    });
+  }
+  //Evento para adicionar Event Listener
+  function adicionaEventListenerClique(btn) {
+    btn.addEventListener('click', function() {
+      eventoAddToCart(btn);
+    });
+  }
+  //Adicionando evento addToCart ao dataLayer
+  function eventoAddToCart(botao) {
+    var informacoesProduto = botao.parentElement.parentElement.parentElement.parentElement;
+    var nomeProduto = informacoesProduto.childNodes[3].textContent;
+    var precoProduto = informacoesProduto.childNodes[7].childNodes[1].childNodes[1].textContent;
+    var quantidade = informacoesProduto.childNodes[13].childNodes[1].childNodes[1].childNodes[1].childNodes[1].value
+        
+    dataLayer.push({
+      'event':'addToCart',
+      'productName':nomeProduto,
+      'productValue':precoProduto,
+      'quantity': quantidade
+    });
+  }
+})();
+</script>
