@@ -1,0 +1,143 @@
+<script>
+  function purchaseEvent() {
+    var metodosDePagamentoSection = document.querySelector('.section-payment .section-body');
+    var metodosDePagamentoDiv = [];
+    var pagamentoEscolhido = '';
+    //Populando array com as formas de pagamento possíveis
+    if (metodosDePagamentoSection !== null) {
+      metodosDePagamentoSection.childNodes.forEach(function(metodoDePagamento) {
+        if (metodoDePagamento.nodeName === 'DIV') metodosDePagamentoDiv.push(metodoDePagamento);
+      });
+    }
+    //Adicionando evento ao radioButton e capturando a escolha do usuário
+    if (metodosDePagamentoDiv !== null) {
+      metodosDePagamentoDiv.forEach(function(div) {
+        var radioButton = div.childNodes[0].childNodes[0].childNodes[0];
+        var radioText = div.childNodes[0].childNodes[0].childNodes[2].innerText
+      
+        radioButton.addEventListener('change', function(event) {
+          pagamentoEscolhido = radioText;
+          console.log('Forma de pagamento: ' + pagamentoEscolhido);
+        });
+      });
+    }
+    //Preparando dados para popular o dataLayer
+    var produtosTable = document.querySelector('#content > div > div > div.right > div.checkout-section.cart-section > div.section-body > div > table > tbody');
+    var produtos = [];
+    var produtosObj = [];
+    //Populando array com os produtos escolhidos
+    if (produtosTable !== null) {
+      produtosTable.childNodes.forEach(function(produto) {
+        if (produto.nodeName === 'TR') produtos.push(produto);
+      });
+    }
+    //Populando array com os produtos escolhidos em forma de objeto
+    if(produtos !== null) {
+      produtos.forEach(function(produto) {
+        var nomeDoProduto = produto.childNodes[2].innerText; 
+        //Capturando o ID do produto a partir da URL de sua página
+        var idDoProduto = produto.querySelector('.text-left.td-product a');
+        var idDoProduto = idDoProduto.href.split("id=", 2);
+        //Coletando as outras informações a partir da tabela de produtos
+        var modeloDoProduto = produto.childNodes[4].innerText;
+        var quantidadeProduto = produto.childNodes[6].childNodes[0].childNodes[0].childNodes[0].value
+        var precoDoProduto = produto.childNodes[8].innerText;
+        //Formatar precoDoProduto
+        precoDoProduto = precoDoProduto.replace(/[R$]/g, '');
+        precoDoProduto = precoDoProduto.replace(/[.,]/g, function(x) {
+          return x == ',' ? '.' : ',';
+        });
+        precoDoProduto = parseFloat(precoDoProduto.replace(/[,]/g, ''));
+
+        var totalDoProduto = produto.childNodes[10].innerText;
+        //Formatar precoDoProduto
+        totalDoProduto = totalDoProduto.replace(/[R$]/g, '');
+        totalDoProduto = totalDoProduto.replace(/[.,]/g, function(x) {
+          return x == ',' ? '.' : ',';
+        });
+        totalDoProduto = parseFloat(totalDoProduto.replace(/[,]/g, ''));
+        //Populando array de produtos com objetos
+        produtosObj.push({
+          'name': nomeDoProduto,
+          'id': idDoProduto[1],
+          'model': modeloDoProduto,
+          'price': precoDoProduto,
+          'quantity': parseInt(quantidadeProduto)
+        });
+      });
+    }
+    //Capturando informações do pagamento
+    var labels = document.querySelectorAll('div.checkout-section.cart-section > div.section-body > table > tfoot > tr > td > strong');
+    var cupomPedido = '';
+    var desconto = '';
+    var metodoFrete = '';
+    var valorFrete = '';
+    var subTotal = '';
+    var taxaPedido = '';
+    var total = '';
+    
+    
+    if (labels !== null) {
+      labels.forEach(function(label) {
+        if (label.textContent.toLowerCase().indexOf('desconto') !== -1) desconto = label.parentElement.parentElement.childNodes[2].textContent;
+        
+        if (label.textContent.toLowerCase().indexOf('dias') !== -1) {
+          metodoFrete = label.textContent;
+          valorFrete = label.parentElement.parentElement.childNodes[2].textContent;
+        }
+    
+        if (label.textContent.toLowerCase().indexOf('sub-') !== -1) subTotal = label.parentElement.parentElement.childNodes[2].textContent;
+    
+        if (label.textContent.toLowerCase().indexOf('total') !== -1) total = label.parentElement.parentElement.childNodes[2].textContent;
+      });
+    }
+    //Formatar valor do pedido
+    valorFrete = valorFrete.replace(/[R$]/g, '');
+    valorFrete = valorFrete.replace(/[.,]/g, function(x) {
+      return x == ',' ? '.' : ',';
+    });
+    valorFrete = parseFloat(valorFrete.replace(/[,]/g, ''));
+    //Formatar valor do pedido
+    var revenue = total.replace(/[R$]/g, '');
+    revenue = revenue.replace(/[.,]/g, function(x) {
+      return x == ',' ? '.' : ',';
+    });
+    revenue = parseFloat(revenue.replace(/[,]/g, ''));
+    
+    var botao = document.querySelector("#quick-checkout-button-confirm");
+    
+    botao.addEventListener('click', function() {
+      var idPedido = '';
+      //Capturando o dia e horário do pedido
+      var data = new Date();
+      var dia = data.getDate();
+      var mes = data.getMonth() + 1;
+      var ano = data.getFullYear();
+      var hora = data.getHours();
+      var minutos = data.getMinutes();
+      var segundos = data.getMinutes();
+      //Gerando o ID do pedido dinamicamente
+      idPedido = 'Pedido-' + ano + '-' + mes + '-' + dia + '-' + hora + '-' + minutos + '-' + segundos;
+      //Populando dataLayer com os dados capturados da página do Checkout
+      window.dataLayer.push({
+        'event': 'eec.purchase',
+        'ecommerce': {
+          'currencyCode': 'BRL',
+          'purchase': {
+            'actionField': {
+              'id': idPedido,
+              'affiliation': 'Santo Lar Móveis',
+              'revenue': revenue,
+              'tax': taxaPedido,
+              'shipping': valorFrete,
+              'coupon': cupomPedido
+            },
+            'products': produtosObj
+          }
+        }
+      });
+    });
+  }
+  //Chamando evento purchase
+  purchaseEvent();
+</script>
