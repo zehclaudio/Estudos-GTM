@@ -1,0 +1,88 @@
+<script>
+  function eecAdd() {
+    var botoesAdicionar = document.querySelectorAll('a.botao.botao-comprar.principal.botao-comprar-ajax');
+    botoesAdicionar.forEach(function(botaoAdicionar) {
+      if(botaoAdicionar !== null) {
+        botaoAdicionar.addEventListener('click', function(event) {
+          var infoProduto = botaoAdicionar.parentElement.parentElement;
+          //Verificando se o botão está na home ou na página do produto
+          if (infoProduto.className.trim() === 'listagem-item' || infoProduto.classList[0] === 'listagem-item') {
+            var idProduto = infoProduto.querySelector('[data-trustvox-product-code]').getAttribute('data-trustvox-product-code');
+            var sku = infoProduto.querySelector('.produto-sku').innerText;
+            var nomeProduto = infoProduto.querySelector('.nome-produto').innerText;
+            var precoProduto = infoProduto.querySelector('.preco-promocional').innerText;
+            var quantidadeProduto = infoProduto.querySelector('.qtde-carrinho').value;
+            //Formatando Preço do Produto
+            precoProduto = precoProduto.replace(/[R$]/g, '');
+            precoProduto = precoProduto.replace(/[.,]/g, function(x) {
+              return x == ',' ? '.' : ',';
+            });
+            precoProduto = precoProduto.replace(/[,]/g, '').trim();
+            //Populando objeto do produto
+            var produto = [];
+            produto.push({
+              'id': idProduto,
+              'sku': sku,
+              'name': nomeProduto,
+              'price': precoProduto,
+              'quantity': parseInt(quantidadeProduto)
+            });
+          
+            window.dataLayer.push({
+              event: 'eec.add',
+              ecommerce: {
+                currencyCode: 'BRL',
+                add: {
+                  actionField: {
+                    list: 'Shopping cart'
+                  },
+                  products: produto
+                }
+              }
+            });
+          }
+          //Produto está na página do produto
+          else {
+            infoProduto = botaoAdicionar.parentElement.parentElement.parentElement;
+            var idProduto = infoProduto.querySelector('.acoes-produto').getAttribute('data-produto-id');
+            var sku = infoProduto.querySelector('[itemprop="sku"]').innerText;
+            var nomeProduto = infoProduto.querySelector('[itemprop="name"]').innerText;
+            var precoProduto = infoProduto.querySelector('.preco-promocional').innerText;
+            var quantidadeProduto = infoProduto.querySelector('.qtde-carrinho').value;
+            //Formatando Preço do Produto
+            precoProduto = precoProduto.replace(/[R$]/g, '');
+            precoProduto = precoProduto.replace(/[.,]/g, function(x) {
+              return x == ',' ? '.' : ',';
+            });
+            precoProduto = precoProduto.replace(/[,]/g, '').trim();
+            //Populando objeto do produto
+            var produto = [];
+            produto.push({
+              'id': idProduto,
+              'sku': sku,
+              'name': nomeProduto,
+              'price': precoProduto,
+              'quantity': parseInt(quantidadeProduto)
+            });
+          
+            window.dataLayer.push({
+              event: 'eec.add',
+              ecommerce: {
+                currencyCode: 'BRL',
+                add: {
+                  actionField: {
+                    list: 'Shopping cart'
+                  },
+                  products: produto
+                }
+              }
+            });
+          }
+        });
+      }
+      else console.log('Botões não encontrados!');
+    });
+  }
+  //Chamando evento eec.add
+  eecAdd();
+</script>
