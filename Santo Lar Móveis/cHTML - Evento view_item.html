@@ -1,0 +1,25 @@
+<script>
+  function viewItemEvent() {
+    var id = window.location.href.split('id=')[1];
+    var preco = document.querySelector("#product > div.product-price-group > div.price-wrapper > div.price-group").innerText;
+	var nome = document.querySelector("body > div.site-wrapper > h1").innerText;
+	//Formatar precoDoProduto
+	preco = preco.replace(/[R$]/g, '');
+	preco = preco.replace(/[.,]/g, function(x) {
+	  return x == ',' ? '.' : ',';
+	});
+	preco = preco.replace(/[,]/g, '').trim();
+
+	dataLayer.push({
+	  'event': 'view_item',
+	  'value': preco,
+  	  'items': [{ 
+        'id': id,
+		'name': nome,
+      	'google_business_vertical': 'retail'
+      }]
+    });
+  }
+  //Chama view_item
+  viewItemEvent();
+</script>
