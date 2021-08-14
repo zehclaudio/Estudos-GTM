@@ -1,0 +1,102 @@
+<script>
+//Função para confirmar Pedido
+function confirmarPedido() {
+  var botao = document.querySelector('#quick-checkout-button-confirm');
+  if (botao !== null) {
+	botao.addEventListener('click', function() {
+	  var dataLayerJs = [];
+	  var produtosObj = [];
+	  //Busca dados dos produtos
+	  var carrinho = document.querySelector('div.checkout-section.cart-section');
+      
+      if (carrinho !== null) {
+		var produtosTr = carrinho.querySelectorAll('tbody > tr');
+		if(produtosTr !== null) {
+		  produtosTr.forEach(function(produto) {
+			var nomeDoProduto = produto.querySelector('td.text-left.td-product > a').innerText;
+        	//Capturando o ID do produto a partir da URL de sua página
+        	var idDoProduto = produto.querySelector('.text-left.td-product a').href.split("id=", 2)[1];
+        	//Coletando as outras informações a partir da tabela de produtos
+        	var modeloDoProduto = produto.querySelector('.td-model').innerText;
+        	var quantidadeProduto = produto.querySelector('.td-qty input').value;
+        	var precoDoProduto = produto.querySelector('.td-price').innerText;
+        	//Formatar precoDoProduto
+        	precoDoProduto = precoDoProduto.replace(/[R$]/g, '');
+        	precoDoProduto = precoDoProduto.replace(/[.,]/g, function(x) {
+          	  return x == ',' ? '.' : ',';
+        	});
+        	precoDoProduto = precoDoProduto.replace(/[,]/g, '').trim();
+        	//Populando array de produtos com objetos
+        	produtosObj.push({
+          	  'name': nomeDoProduto,
+          	  'id': idDoProduto,
+          	  'model': modeloDoProduto,
+          	  'price': precoDoProduto,
+          	  'quantity': parseInt(quantidadeProduto),
+          	  'google_business_vertical': 'retail'
+        	});
+		  });
+		}
+		else console.log('Nenhum produto no carrinho.');
+	  }
+	  var desconto = '';
+	  var subTotal = '';
+	  var total  = '';
+      var metodoFrete = '';
+	  var valorFrete = '';
+	  var labelsTable = document.querySelector('.checkout-section.cart-section table > tfoot');
+	  var labels = labelsTable.querySelectorAll('tr td:nth-child(1)');
+	  if (labels !== null) {
+        labels.forEach(function(label) {
+		  //Captura valor do desconto
+          if (label.textContent.toLowerCase().indexOf('desconto') !== -1) desconto = label.parentElement.childNodes[2].textContent;
+		  //Captura valor doFrete
+          if (label.textContent.toLowerCase().indexOf('dias') !== -1) {
+            metodoFrete = label.textContent;
+          	valorFrete = label.parentElement.childNodes[2].textContent;
+          }
+		  //Captura valor do sub-total
+          if (label.textContent.toLowerCase().indexOf('sub-') !== -1) subTotal = label.parentElement.childNodes[2].textContent;
+		  //Captura valor do total
+          if (label.textContent.toLowerCase().indexOf('total') !== -1) total = label.parentElement.childNodes[2].textContent;
+      	});
+      }
+	  //Formatar total do pedido
+	  total = total.replace(/[R$]/g, '');
+	  total = total.replace(/[.,]/g, function(x) {
+	    return x == ',' ? '.' : ',';
+	  });
+	  total = total.replace(/[,]/g, '').trim();
+    //Populando dataLayer com os dados capturados da página do Checkout
+    dataLayerJs.push({
+      'event': 'eec.purchase',
+      'ecommerce': {
+        'currencyCode': 'BRL',
+        'purchase': {
+          'actionField': {
+            'affiliation': 'Santo Lar Móveis',
+            'revenue': total,
+            'shipping': valorFrete,
+       	  },
+     	    'products': produtosObj
+        }
+      }
+    });
+    localStorage.setItem('dlPurchase', JSON.stringify(dataLayerJs));
+	  console.log('Dados salvos na página: ' + JSON.stringify(dataLayerJs));
+    });
+  }
+  else console.log('Botão "Confirmar Pedido" não encontrado!');
+}
+//Chama confirmarPedido após o carregamento completo da página
+function esperaBotao() {
+  if (document.getElementById('quick-checkout-button-confirm') !== null) {
+    console.log('Botão "Confirmar Pedido" encontrado. Página completamente carregada.');
+    confirmarPedido();
+  } else {
+    console.log('Botão "Confirmar Pedido" não encontrado!');
+    setTimeout(esperaBotao, 50);
+  }
+}
+esperaBotao();
+</script>
