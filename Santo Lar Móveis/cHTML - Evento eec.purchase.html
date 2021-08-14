@@ -67,22 +67,22 @@ function confirmarPedido() {
 	    return x == ',' ? '.' : ',';
 	  });
 	  total = total.replace(/[,]/g, '').trim();
-    //Populando dataLayer com os dados capturados da página do Checkout
-    dataLayerJs.push({
-      'event': 'eec.purchase',
-      'ecommerce': {
-        'currencyCode': 'BRL',
-        'purchase': {
-          'actionField': {
-            'affiliation': 'Santo Lar Móveis',
-            'revenue': total,
-            'shipping': valorFrete,
-       	  },
-     	    'products': produtosObj
+      //Populando dataLayer com os dados capturados da página do Checkout
+      dataLayerJs.push({
+      	'event': 'eec.purchase',
+        'ecommerce': {
+          'currencyCode': 'BRL',
+          'purchase': {
+            'actionField': {
+              'affiliation': 'Santo Lar Móveis',
+              'revenue': total,
+              'shipping': valorFrete,
+          	},
+          	'products': produtosObj
+          }
         }
-      }
-    });
-    localStorage.setItem('dlPurchase', JSON.stringify(dataLayerJs));
+      });
+      localStorage.setItem('dlPurchase', JSON.stringify(dataLayerJs));
 	  console.log('Dados salvos na página: ' + JSON.stringify(dataLayerJs));
     });
   }
