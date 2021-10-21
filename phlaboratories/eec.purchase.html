@@ -1,0 +1,59 @@
+<script>
+    var produtosObj = [];
+    
+    var total = document.querySelector('.SubTotalInfo2 td.LabelValor').innerText;
+    //Formatar total do pedido
+	total = total.replace(/[R$]/g, '');
+	total = total.replace(/[.,]/g, function(x) {
+	  return x == ',' ? '.' : ',';
+    });
+	total = total.replace(/[,]/g, '').trim();
+    
+    var valorFrete = document.querySelector('.SubTotalInfo1:nth-child(2) td.LabelValor').innerText.split('\n')[0];
+    //Formatar valor do frete
+	valorFrete = valorFrete.replace(/[+ R$]/g, '');
+	valorFrete = valorFrete.replace(/[.,]/g, function(x) {
+	  return x == ',' ? '.' : ',';
+    });
+	valorFrete = valorFrete.replace(/[,]/g, '').trim();
+    //Capturando dados dos produtos
+    var tabelaProdutos = document.querySelector('#BoxPagFin_A > table > tbody');
+    tabelaProdutos.querySelectorAll('.Produto').forEach(function(linha) {
+      var produto = linha.parentElement;
+      var nomeDoProduto = produto.querySelector('td').innerText;
+      var idDoProduto = nomeDoProduto;
+      var precoDoProduto = produto.querySelector('td:nth-child(3)').innerText;
+      //Formatar preço do produto
+	  precoDoProduto = precoDoProduto.replace(/[R$]/g, '');
+	  precoDoProduto = precoDoProduto.replace(/[.,]/g, function(x) {
+	    return x == ',' ? '.' : ',';
+      });
+	  precoDoProduto = precoDoProduto.replace(/[,]/g, '').trim();
+      
+      var quantidadeDoProduto = produto.querySelector('td:nth-child(2)').innerText.split('x')[0];
+      //Populando array de produtos com objetos
+      produtosObj.push({
+        'name': nomeDoProduto,
+        'id': idDoProduto,
+        'price': precoDoProduto,
+        'quantity': parseInt(quantidadeDoProduto),
+        'google_business_vertical': 'retail'
+      });
+    })    
+    //Populando dataLayer com os dados capturados da página do Checkout
+    dataLayer.push({
+      'event': 'eec.purchase',
+      'ecommerce': {
+        'currencyCode': 'BRL',
+        'purchase': {
+          'actionField': {
+            'id': Date.now(),
+            'affiliation': 'pHlaboratories',
+            'revenue': total,
+            'shipping': valorFrete,
+          },
+          'products': produtosObj
+        }
+      }
+    });
+</script>
